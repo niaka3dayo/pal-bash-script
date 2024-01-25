@@ -2,33 +2,23 @@
 
 # このスクリプトは、SteamCMDを使って、Palworldのゲームサーバーを更新します。
 
-# Steam CMD のパス
-STEAM_CMD="/home/ubuntu/steamcmd.sh"
-
-# パルワールドのインストールディレクトリ
-INSTALL_DIR="/home/ubuntu/Steam/steamapps/common/PalServer"
-
-# サーバーのデーモン名
-DAEMON_NAME="palserver.service"
-
-echo "# Check the environment."
+echo "現在のバージョンを確認します。"
 date
-OLD_Build=`$STEAM_CMD +force_install_dir $INSTALL_DIR +login anonymous +app_status 2394010 +quit | grep -e "BuildID" | awk '{print $8}'`
-echo "Old BuildID: $OLD_Build"
+OLD_BUILD_ID=`steamcmd +login anonymous +app_status 2394010 +quit | grep -e "BuildID" | awk '{print $8}'`
+echo "現在のビルドID: $OLD_BUILD_ID"
 
-echo "# Start updating the game server..."
-$STEAM_CMD +force_install_dir $INSTALL_DIR +login anonymous +app_update 2394010 validate +quit > /dev/null
+echo "サーバーの更新を開始します。"
+steamcmd +login anonymous +app_update 2394010 validate +quit > /dev/null
 
-echo "# Check the environment after the update."
-NEW_Build=`$STEAM_CMD +force_install_dir $INSTALL_DIR +login anonymous +app_status 2394010 +quit | grep -e "BuildID" | awk '{print $8}'`
-echo "New BuildID: $NEW_Build"
+echo "更新後のバージョンを確認します。"
+NEW_BUILD_ID=`steamcmd +login anonymous +app_status 2394010 +quit | grep -e "BuildID" | awk '{print $8}'`
+echo "更新後のBuildID: $NEW_BUILD_ID"
 
-# Check if updated.
-if [ $OLD_Build = $NEW_Build ]; then
-    echo "Build number matches."
+# バージョンが変わったかどうかを確認する
+if [ $OLD_BUILD_ID = $NEW_BUILD_ID ]; then
+    # バージョンが変わらなかった場合の処理
+    echo "バージョンは変わりませんでした"
 else
-    echo "Restart $DAEMON_NAME because an game update exists."
-    sudo systemctl stop $DAEMON_NAME
-    sudo systemctl start $DAEMON_NAME
-    systemctl status $DAEMON_NAME
+    # バージョンが変わった場合の処理
+    echo "バージョンが変わりました"
 fi
