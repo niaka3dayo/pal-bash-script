@@ -29,6 +29,7 @@ MAX_BACKUP_COUNT=5
 send_discord_message() {
     local message=$1
     curl -X POST -H "Content-Type: application/json" -d "{\"content\": \"$message\"}" $WEBHOOK_URL
+    echo "Message sent to Discord: $message"
 }
 
 # ワールド内にメッセージを送信する関数
@@ -38,6 +39,7 @@ send_world_message() {
     local message=$1
     CURRENT_TIME=$(TZ=Asia/Tokyo date '+%H:%M')
     mcrcon -H $RCON_IP -P $RCON_PORT -p $RCON_PASSWORD "Broadcast [$CURRENT_TIME]:$message"
+    echo "Message sent to world: [$CURRENT_TIME]:$message"
 }
 
 # ワールドデータをセーブする関数
@@ -45,6 +47,7 @@ send_world_message() {
 # 他のRCONクライアントを使用する場合は、この関数を書き換える必要がある
 save_world_data() {
     mcrcon -H $RCON_IP -P $RCON_PORT -p $RCON_PASSWORD "Save"
+    echo "Save command sent to world."
 }
 
 # ワールドデータをバックアップする関数
@@ -58,6 +61,7 @@ backup_world_data() {
     # バックアップ保存先のディレクトリにzip形式でバックアップを作成
     # ファイル名形式は PalWorldSave_YYYYMMDD-HHMM-S.zip
     zip -r $WORLD_BACKUP_PATH/PalWorldSave_$(TZ=Asia/Tokyo date '+%Y%m%d-%H%M-%S').zip $WORLD_SAVE_PATH
+    echo "World data backup created: $WORLD_BACKUP_PATH/PalWorldSave_$(TZ=Asia/Tokyo date '+%Y%m%d-%H%M-%S').zip"
 
     # バックアップがMAX_BACKUP_COUNT以上存在する場合は古いものから削除
     BACKUP_COUNT=$(ls $WORLD_BACKUP_PATH | wc -l)
@@ -68,6 +72,7 @@ backup_world_data() {
 
 # 現在のメモリ使用量を取得
 MEMORY_USAGE=$(free | awk '/Mem:/ {print int($3/$2 * 100.0)}')
+echo "Memory usage: $MEMORY_USAGE%"
 
 # サーバーのメモリ使用量をワールドに通知
 send_world_message "MemoryUsage=$MEMORY_USAGE%/$THRESHOLD%"
