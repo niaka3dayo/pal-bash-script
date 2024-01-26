@@ -3,9 +3,6 @@
 # 再起動が必要と判断するしきい値（パーセントで指定）
 THRESHOLD=80
 
-# DISCORDのWebhookのURL 適時変更
-WEBHOOK_URL="https://discord.com/api/webhooks/xxxxxxx"
-
 # RCONのIPアドレス
 RCON_IP="127.0.0.1"
 
@@ -23,14 +20,6 @@ WORLD_BACKUP_PATH="/home/ubuntu/PalSeverBackup"
 
 # 作成するバックアップの最大数
 MAX_BACKUP_COUNT=5
-
-# Discordにメッセージを送信する関数
-# curlコマンドを使用しているため、curlコマンドが使用可能である必要がある
-send_discord_message() {
-    local message=$1
-    curl -X POST -H "Content-Type: application/json" -d "{\"content\": \"$message\"}" $WEBHOOK_URL
-    echo "Message sent to Discord: $message"
-}
 
 # ワールド内にメッセージを送信する関数
 # mcronコマンドを使用しているため、RCONが有効で、mcrconコマンドが使用可能である必要がある
@@ -80,7 +69,7 @@ send_world_message "MemoryUsage=$MEMORY_USAGE%/$THRESHOLD%"
 # 使用量が閾値を超えた場合
 if [ $MEMORY_USAGE -gt $THRESHOLD ]; then
   # Discordに通知
-  send_discord_message "メモリ使用量が閾値を超えました。1分後にワールドサーバーを強制的に再起動します。 メモリ使用量: $MEMORY_USAGE%"
+  bash ./send-discord-message.sh "メモリ使用量が閾値を超えました。1分後にワールドサーバーを強制的に再起動します。 メモリ使用量: $MEMORY_USAGE%"
   # ワールド内に通知
   send_world_message "Restarting_server_in_1_minute_due_to_high_memory_usage._please_log_out."
   # 1分待機
@@ -88,7 +77,7 @@ if [ $MEMORY_USAGE -gt $THRESHOLD ]; then
   # セーブを実行してから10秒待機
   save_world_data
   # セーブ中であることをDiscordとワールド内に通知
-  send_discord_message "ワールドデータをセーブ中です。"
+  bash ./send-discord-message.sh "ワールドデータをセーブ中です。"
   send_world_message "Saving_world_data."
   sleep 10
   # 最終ワールド通知を送信
@@ -96,7 +85,7 @@ if [ $MEMORY_USAGE -gt $THRESHOLD ]; then
   sleep 5
   # ワールドサーバーを停止してDsicordに通知し、10秒待機
   sudo systemctl stop palserver.service
-  send_discord_message "ワールドサーバーを停止しました。"
+  bash ./send-discord-message.sh "ワールドサーバーを停止しました。"
   # サーバー停止後にワールドデータのバックアップを作成して10秒待機
   backup_world_data
   sleep 10
@@ -104,5 +93,5 @@ if [ $MEMORY_USAGE -gt $THRESHOLD ]; then
   sudo systemctl start palserver.service
   sleep 10
   # 再起動完了をDiscordに通知
-  send_discord_message "ワールドサーバーの再起動が完了しました。"
+  bash ./send-discord-message.sh "ワールドサーバーの再起動が完了しました。"
 fi
