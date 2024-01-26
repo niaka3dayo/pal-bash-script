@@ -1,6 +1,6 @@
 #!/bin/bash
 
-source ./rcon-functions.sh
+. /home/ubuntu/bash-scripts/rcon-functions.sh
 
 # 再起動が必要と判断するしきい値（パーセントで指定）
 THRESHOLD=80
