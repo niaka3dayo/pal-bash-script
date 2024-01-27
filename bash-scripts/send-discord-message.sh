@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# sourceコマンドで読み込んでDiscordにメッセージを送信する関数を使用するためのスクリプト
+
 # DISCORDのWebhookのURL
 WEBHOOK_URL="https://discord.com/api/webhooks/xxxxxxx"
 
@@ -9,6 +11,3 @@ send_discord_message() {
     curl -X POST -H "Content-Type: application/json" -d "{\"content\": \"$message\"}" $WEBHOOK_URL
     echo "Message sent to Discord: $message"
 }
-
-# メッセージの送信を実行
-send_discord_message "$1"

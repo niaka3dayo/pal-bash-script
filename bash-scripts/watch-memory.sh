@@ -1,6 +1,13 @@
 #!/bin/bash
 
+# RCON用の関数を読み込み
 . /home/ubuntu/bash-scripts/rcon-functions.sh
+
+# Discordにメッセージを送信する関数を読み込み
+. /home/ubuntu/bash-scripts/send-discord-message.sh
+
+# ワールドデータをバックアップする関数を読み込み
+. /home/ubuntu/bash-scripts/backup-world-data.sh
 
 # 再起動が必要と判断するしきい値（パーセントで指定）
 THRESHOLD=80
@@ -15,7 +22,7 @@ send_world_message "MemoryUsage=$MEMORY_USAGE%/$THRESHOLD%"
 # 使用量が閾値を超えた場合
 if [ $MEMORY_USAGE -gt $THRESHOLD ]; then
   # Discordに通知
-  bash ./send-discord-message.sh "メモリ使用量が閾値を超えました。1分後にワールドサーバーを強制的に再起動します。 メモリ使用量: $MEMORY_USAGE%"
+  send_discord_message "メモリ使用量が閾値を超えました。1分後にワールドサーバーを強制的に再起動します。 メモリ使用量: $MEMORY_USAGE%"
   # ワールド内に通知
   send_world_message "Restarting_server_in_1_minute_due_to_high_memory_usage._please_log_out."
   # 1分待機
@@ -23,7 +30,7 @@ if [ $MEMORY_USAGE -gt $THRESHOLD ]; then
   # セーブを実行してから10秒待機
   save_world_data
   # セーブ中であることをDiscordとワールド内に通知
-  bash ./send-discord-message.sh "ワールドデータをセーブ中です。"
+  send_discord_message "ワールドデータをセーブ中です。"
   send_world_message "Saving_world_data."
   sleep 10
   # 最終ワールド通知を送信
@@ -31,13 +38,13 @@ if [ $MEMORY_USAGE -gt $THRESHOLD ]; then
   sleep 5
   # ワールドサーバーを停止してDsicordに通知し、10秒待機
   sudo systemctl stop palserver.service
-  bash ./send-discord-message.sh "ワールドサーバーを停止しました。"
+  send_discord_message "ワールドサーバーを停止しました。"
   # サーバー停止後にワールドデータのバックアップを作成して10秒待機
-  bash ./backup-world-data.sh
+  backup_world_data
   sleep 10
   # ワールドサーバーを起動して10秒待機
   sudo systemctl start palserver.service
   sleep 10
   # 再起動完了をDiscordに通知
-  bash ./send-discord-message.sh "ワールドサーバーの再起動が完了しました。"
+  send_discord_message "ワールドサーバーの再起動が完了しました。"
 fi

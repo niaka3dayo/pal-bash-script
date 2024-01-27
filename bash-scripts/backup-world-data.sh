@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# sourceコマンドで読み込んでRCON用の関数を使用するためのスクリプト
+
 # セーブデータのパス
 WORLD_SAVE_PATH="/home/ubuntu/Steam/steamapps/common/PalServer/Pal/Saved/SaveGames"
 
@@ -28,6 +30,3 @@ backup_world_data() {
         rm $(ls -t $WORLD_BACKUP_PATH | tail -n $(($BACKUP_COUNT - $MAX_BACKUP_COUNT)))
     fi
 }
-
-# バックアップの作成を実行
-backup_world_data
