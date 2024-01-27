@@ -160,6 +160,10 @@ pal() {
     if [ "$1" = "check" ]; then
         bash ~/bash-scripts/watch-memory.sh
     fi
+    # パルサーバーのセーブデータをバックアップする
+    if [ "$1" = "backup" ]; then
+        bash ~/bash-scripts/backup-world-data.sh
+    fi
 
     # 設定されてない場合・palのみの場合はヘルプを表示する
     if [ -z "$1" ] || [ "$1" = "help" ]; then
@@ -172,5 +176,6 @@ pal() {
         echo "pal update: パルサーバーを更新する"
         echo "pal log: パルサーバーdaemonのログを表示する"
         echo "pal check: パルサーバーのメモリ状態を確認し、必要に応じて再起動する"
+        echo "pal backup: パルサーバーのセーブデータをバックアップする"
     fi
 }
