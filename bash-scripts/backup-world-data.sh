@@ -27,6 +27,13 @@ backup_world_data() {
     # バックアップがMAX_BACKUP_COUNT以上存在する場合は古いものから削除
     BACKUP_COUNT=$(ls $WORLD_BACKUP_PATH | wc -l)
     if [ $BACKUP_COUNT -gt $MAX_BACKUP_COUNT ]; then
-        rm $(ls -t $WORLD_BACKUP_PATH | tail -n $(($BACKUP_COUNT - $MAX_BACKUP_COUNT)))
+        # 削除する古いバックアップファイルのリストを取得
+        OLD_BACKUPS=$(ls -t $WORLD_BACKUP_PATH | tail -n $(($BACKUP_COUNT - $MAX_BACKUP_COUNT)))
+
+        # 完全なファイルパスを含む古いバックアップファイルを削除
+        for backup in $OLD_BACKUPS; do
+            rm "$WORLD_BACKUP_PATH/$backup" \
+            && echo "Old world data backup deleted: $WORLD_BACKUP_PATH/$backup"
+        done
     fi
 }
