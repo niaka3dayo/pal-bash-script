@@ -9,11 +9,19 @@
 # ワールドデータをバックアップする関数を読み込み
 . /home/ubuntu/bash-scripts/backup-world-data.sh
 
+# 現在のメモリ使用量を取得する関数
+get_memory_usage() {
+  # 現在のメモリ使用量を取得
+  MEMORY_USAGE=$(free | awk '/Mem:/ {print int($3/$2 * 100.0)}')
+  # メモリ使用量を返す
+  echo $MEMORY_USAGE
+}
+
 # 再起動が必要と判断するしきい値（パーセントで指定）
 THRESHOLD=80
 
 # 現在のメモリ使用量を取得
-MEMORY_USAGE=$(free | awk '/Mem:/ {print int($3/$2 * 100.0)}')
+MEMORY_USAGE=$(get_memory_usage)
 echo "Memory usage: $MEMORY_USAGE%"
 
 # サーバーのメモリ使用量をワールドに通知
@@ -47,4 +55,7 @@ if [ $MEMORY_USAGE -gt $THRESHOLD ]; then
   sleep 10
   # 再起動完了をDiscordに通知
   send_discord_message "ワールドサーバーの再起動が完了しました。"
+  #最新のメモリ使用量をDiscordに通知
+  MEMORY_USAGE=$(get_memory_usage)
+  send_discord_message "再起動後のメモリ使用量: $MEMORY_USAGE%/$THRESHOLD%"
 fi
