@@ -162,7 +162,8 @@ pal() {
     fi
     # パルサーバーのセーブデータをバックアップする
     if [ "$1" = "backup" ]; then
-        bash ~/bash-scripts/backup-world-data.sh
+        . ~/bash-scripts/backup-world-data.sh
+        backup_world_data
     fi
 
     # 設定されてない場合・palのみの場合はヘルプを表示する
